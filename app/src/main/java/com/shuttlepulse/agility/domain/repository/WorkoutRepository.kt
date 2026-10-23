@@ -26,7 +26,8 @@ interface WorkoutRepository {
         duckingEnabled: Boolean,
         metronomeEnabled: Boolean,
         voiceEnabled: Boolean,
-        bpmScale: Float
+        bpmScale: Float,
+        bpmOffset: Int = 0
     )
     suspend fun ensureSeeded()
 }

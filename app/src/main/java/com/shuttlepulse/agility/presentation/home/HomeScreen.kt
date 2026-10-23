@@ -56,7 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.R
+import com.shuttlepulse.agility.R
 import com.shuttlepulse.agility.core.ui.theme.ShuttlePulseColors
 import com.shuttlepulse.agility.domain.model.DominantHand
 import com.shuttlepulse.agility.domain.model.SessionLog
@@ -65,6 +65,13 @@ import com.shuttlepulse.agility.domain.model.WorkoutCircuit
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+enum class DurationFilter(val label: String) {
+    ALL("All"),
+    UNDER_10M("Under 10m"),
+    TEN_TO_EIGHTEEN("10-18m"),
+    TWENTY_PLUS("20m+ Endurance")
+}
 
 @Composable
 fun HomeScreen(
@@ -75,6 +82,16 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showAudioSettings by remember { mutableStateOf(false) }
+    var selectedDurationFilter by remember { mutableStateOf(DurationFilter.ALL) }
+
+    val filteredCircuits = remember(state.circuits, selectedDurationFilter) {
+        when (selectedDurationFilter) {
+            DurationFilter.ALL -> state.circuits
+            DurationFilter.UNDER_10M -> state.circuits.filter { it.totalDurationMinutes < 10 }
+            DurationFilter.TEN_TO_EIGHTEEN -> state.circuits.filter { it.totalDurationMinutes in 10..18 }
+            DurationFilter.TWENTY_PLUS -> state.circuits.filter { it.totalDurationMinutes >= 20 }
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -145,7 +162,36 @@ fun HomeScreen(
             }
         }
 
-        items(state.circuits, key = { it.id }) { circuit ->
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                DurationFilter.entries.forEach { filter ->
+                    val selected = selectedDurationFilter == filter
+                    FilterChip(
+                        selected = selected,
+                        onClick = { selectedDurationFilter = filter },
+                        modifier = Modifier.testTag("filter_${filter.name.lowercase()}"),
+                        label = {
+                            Text(
+                                text = filter.label,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = ShuttlePulseColors.VoltPlyoLime.copy(alpha = 0.22f),
+                            selectedLabelColor = ShuttlePulseColors.VoltPlyoLime,
+                            unselectedLabelColor = ShuttlePulseColors.TextSlateMuted
+                        )
+                    )
+                }
+            }
+        }
+
+        items(filteredCircuits, key = { it.id }) { circuit ->
             WorkoutCircuitCard(
                 circuit = circuit,
                 isSelected = circuit.id == state.activeCircuit?.id,
@@ -270,12 +316,13 @@ private fun ActiveSessionHeroCard(
                 }
             }
 
-            // 1-Tap Plan Duration Switcher (15 MIN / 20 MIN / 25 MIN)
+            // 1-Tap Plan Duration Switcher (4 / 8 / 15 / 20 / 25 MIN)
             val preBuiltPlans = allCircuits.filter { it.isPreBuilt }
             if (preBuiltPlans.isNotEmpty()) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
                         .padding(start = 16.dp, end = 16.dp, top = 10.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -285,9 +332,7 @@ private fun ActiveSessionHeroCard(
                         FilterChip(
                             selected = selected,
                             onClick = { onSelectCircuit(plan) },
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("quick_plan_${mins}min_chip"),
+                            modifier = Modifier.testTag("quick_plan_${mins}min_chip"),
                             label = {
                                 Text(
                                     text = "$mins MIN (${plan.totalSetsCount}S)",
@@ -387,7 +432,7 @@ private fun DominantHandAndAudioCard(
     expandedAudio: Boolean,
     onToggleAudioExpand: () -> Unit,
     onSelectHand: (DominantHand) -> Unit,
-    onUpdateAudioPrefs: (Boolean, Boolean, Boolean, Float) -> Unit
+    onUpdateAudioPrefs: (Boolean, Boolean, Boolean, Float, Int) -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = ShuttlePulseColors.GymSurfaceDark),
@@ -487,7 +532,8 @@ private fun DominantHandAndAudioCard(
                                 it,
                                 preferences.metronomeTickEnabled,
                                 preferences.voiceCalloutsEnabled,
-                                preferences.bpmCalibrationScale
+                                preferences.bpmCalibrationScale,
+                                preferences.bpmOffset
                             )
                         },
                         colors = SwitchDefaults.colors(
@@ -514,7 +560,8 @@ private fun DominantHandAndAudioCard(
                                 preferences.audioDuckingEnabled,
                                 it,
                                 preferences.voiceCalloutsEnabled,
-                                preferences.bpmCalibrationScale
+                                preferences.bpmCalibrationScale,
+                                preferences.bpmOffset
                             )
                         },
                         colors = SwitchDefaults.colors(
@@ -541,7 +588,8 @@ private fun DominantHandAndAudioCard(
                                 preferences.audioDuckingEnabled,
                                 preferences.metronomeTickEnabled,
                                 preferences.voiceCalloutsEnabled,
-                                it
+                                it,
+                                preferences.bpmOffset
                             )
                         },
                         valueRange = 0.80f..1.20f,

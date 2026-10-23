@@ -26,22 +26,24 @@ class AuditFeatureHealthUseCase @Inject constructor(
     ): List<DiagnosticCheckResult> {
         val results = mutableListOf<DiagnosticCheckResult>()
 
-        // 1. Database Seed & 15/20/25-Min Workout Plans Check (16 Exercises + 3 Pre-Built Programs)
+        // 1. Database Seed & Pro Conditioning Plans Check (16 Exercises + 5 Pre-Built Programs)
         val archetypesCovered = exercises.map { it.archetype }.toSet()
         val preBuilt = circuits.filter { it.isPreBuilt }
+        val has4Min = preBuilt.any { it.totalDurationSeconds == 240 }
+        val has8Min = preBuilt.any { it.totalDurationSeconds == 480 }
         val has15Min = preBuilt.any { it.totalDurationSeconds == 900 }
         val has20Min = preBuilt.any { it.totalDurationSeconds == 1200 }
         val has25Min = preBuilt.any { it.totalDurationSeconds == 1500 }
-        val seedPassed = exercises.size >= 16 && preBuilt.size >= 3 &&
-            has15Min && has20Min && has25Min &&
+        val seedPassed = exercises.size >= 16 && preBuilt.size >= 5 &&
+            has4Min && has8Min && has15Min && has20Min && has25Min &&
             DrillArchetype.entries.all { it in archetypesCovered }
 
         results.add(
             DiagnosticCheckResult(
                 id = "database_seed_check",
-                title = "Room Seed & 15/20/25-Min Plans (16 Drills + 3 Programs)",
+                title = "Room Seed & 5 Pro Plans (16 Drills + 5 Conditioning Programs)",
                 passed = seedPassed,
-                detail = "Loaded ${exercises.size}/16 drills + 15m (900s), 20m (1200s), and 25m (1500s) pro conditioning plans."
+                detail = "Loaded ${exercises.size}/16 drills + 4m (240s), 8m (480s), 15m (900s), 20m (1200s), and 25m (1500s) plans across all 4 archetypes."
             )
         )
 
@@ -89,7 +91,7 @@ class AuditFeatureHealthUseCase @Inject constructor(
                 id = "archetypes_timeline_check",
                 title = "4-Archetype Timeline & Unilateral 50% Switch Engine",
                 passed = timelinePassed,
-                detail = "Verified 15m/20m/25m timelines, BPM intervals (400ms/250ms), 1-2-3-4-EXPLODE combos, and 50% side switches."
+                detail = "Verified 4m/8m/15m/20m/25m timelines, BPM cadence ticks, 1-2-3-4-EXPLODE combos, and 50% unilateral switches."
             )
         )
 

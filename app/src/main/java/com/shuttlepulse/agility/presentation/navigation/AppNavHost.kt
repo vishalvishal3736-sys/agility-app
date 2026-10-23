@@ -39,8 +39,10 @@ import com.shuttlepulse.agility.core.ui.theme.ShuttlePulseColors
 import com.shuttlepulse.agility.di.AppModule
 import com.shuttlepulse.agility.presentation.builder.BuilderViewModel
 import com.shuttlepulse.agility.presentation.builder.CircuitBuilderScreen
-import com.shuttlepulse.agility.presentation.diagnostics.DiagnosticsScreen
-import com.shuttlepulse.agility.presentation.diagnostics.DiagnosticsViewModel
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Settings
+import com.shuttlepulse.agility.presentation.settings.SettingsScreen
+import com.shuttlepulse.agility.presentation.settings.SettingsViewModel
 import com.shuttlepulse.agility.presentation.home.HomeScreen
 import com.shuttlepulse.agility.presentation.home.HomeViewModel
 import com.shuttlepulse.agility.presentation.library.DrillLibraryScreen
@@ -63,7 +65,7 @@ sealed interface ShuttlePulseRoute {
     data object Player : ShuttlePulseRoute
 
     @Serializable
-    data object Diagnostics : ShuttlePulseRoute
+    data object Settings : ShuttlePulseRoute
 }
 
 private data class NavTabItem<T : Any>(
@@ -119,11 +121,11 @@ fun AppNavHost(
             unselectedIcon = Icons.Outlined.PlayCircleOutline
         ),
         NavTabItem(
-            route = ShuttlePulseRoute.Diagnostics,
-            label = "Self-Test",
-            testTag = "nav_tab_diagnostics",
-            selectedIcon = Icons.Filled.BuildCircle,
-            unselectedIcon = Icons.Outlined.BuildCircle
+            route = ShuttlePulseRoute.Settings,
+            label = "Settings",
+            testTag = "nav_tab_settings",
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings
         )
     )
 
@@ -251,16 +253,16 @@ fun AppNavHost(
                 )
             }
 
-            composable<ShuttlePulseRoute.Diagnostics> {
-                val diagnosticsViewModel: DiagnosticsViewModel = viewModel(
-                    factory = DiagnosticsViewModel.provideFactory(
+            composable<ShuttlePulseRoute.Settings> {
+                val settingsViewModel: SettingsViewModel = viewModel(
+                    factory = SettingsViewModel.provideFactory(
                         workoutRepository = workoutRepository,
                         cadenceSoundEngine = cadenceSoundEngine,
                         workoutTimer = workoutTimer,
                         auditFeatureHealthUseCase = auditFeatureHealthUseCase
                     )
                 )
-                DiagnosticsScreen(viewModel = diagnosticsViewModel)
+                SettingsScreen(viewModel = settingsViewModel)
             }
         }
     }

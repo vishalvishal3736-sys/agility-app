@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.shuttlepulse.agility.data.local.seed.AuthenticBadmintonDrillsSeed
@@ -34,6 +35,7 @@ class UserPreferencesRepository @Inject constructor(
         val AUDIO_DUCKING = booleanPreferencesKey("audio_ducking_enabled")
         val METRONOME_TICK = booleanPreferencesKey("metronome_tick_enabled")
         val VOICE_CALLOUTS = booleanPreferencesKey("voice_callouts_enabled")
+        val BPM_OFFSET = intPreferencesKey("bpm_offset")
         val BPM_CALIBRATION_SCALE = floatPreferencesKey("bpm_calibration_scale")
         val ACTIVE_CIRCUIT_JSON = stringPreferencesKey("active_circuit_json")
     }
@@ -46,6 +48,7 @@ class UserPreferencesRepository @Inject constructor(
             audioDuckingEnabled = prefs[Keys.AUDIO_DUCKING] ?: true,
             metronomeTickEnabled = prefs[Keys.METRONOME_TICK] ?: true,
             voiceCalloutsEnabled = prefs[Keys.VOICE_CALLOUTS] ?: true,
+            bpmOffset = prefs[Keys.BPM_OFFSET] ?: 0,
             bpmCalibrationScale = prefs[Keys.BPM_CALIBRATION_SCALE] ?: 1.0f
         )
     }
@@ -70,12 +73,14 @@ class UserPreferencesRepository @Inject constructor(
         duckingEnabled: Boolean,
         metronomeEnabled: Boolean,
         voiceEnabled: Boolean,
-        bpmScale: Float
+        bpmScale: Float,
+        bpmOffset: Int = 0
     ) {
         context.shuttlePulseDataStore.edit { prefs ->
             prefs[Keys.AUDIO_DUCKING] = duckingEnabled
             prefs[Keys.METRONOME_TICK] = metronomeEnabled
             prefs[Keys.VOICE_CALLOUTS] = voiceEnabled
+            prefs[Keys.BPM_OFFSET] = bpmOffset.coerceIn(-20, 20)
             prefs[Keys.BPM_CALIBRATION_SCALE] = bpmScale.coerceIn(0.75f, 1.25f)
         }
     }

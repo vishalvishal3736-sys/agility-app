@@ -1,4 +1,4 @@
-package com.example
+package com.shuttlepulse.agility
 
 import android.os.Bundle
 import android.view.WindowManager

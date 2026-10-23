@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
+import com.shuttlepulse.agility.R
 
 object ShuttlePulseColors {
     val OledGymBlack = Color(0xFF04060A)

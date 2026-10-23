@@ -1,29 +1,5 @@
 package com.shuttlepulse.agility.domain.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class UserPreferences(
-    val dominantHand: DominantHand = DominantHand.RIGHT,
-    val audioDuckingEnabled: Boolean = true,
-    val metronomeTickEnabled: Boolean = true,
-    val voiceCalloutsEnabled: Boolean = true,
-    val bpmCalibrationScale: Float = 1.0f
-)
-
-@Serializable
-data class SessionLog(
-    val id: Long = 0L,
-    val workoutTitle: String,
-    val timestampEpochMs: Long,
-    val completedSets: Int,
-    val totalWorkSec: Int,
-    val totalRestSec: Int,
-    val estimatedGroundContacts: Int,
-    val explosiveBurstsExecuted: Int,
-    val dominantHandUsed: DominantHand
-)
-
 data class PlayerUiState(
     val activeCircuit: WorkoutCircuit? = null,
     val segments: List<WorkoutSegment> = emptyList(),

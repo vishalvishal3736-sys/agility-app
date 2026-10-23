@@ -333,7 +333,37 @@ object AuthenticBadmintonDrillsSeed {
     private fun ex(id: String): Exercise = exercises.first { it.id == id }
 
     val preBuiltCircuits: List<WorkoutCircuit> = listOf(
-        // Plan 1: Exact 15 Minutes (900s total = 18 Sets across 5 Drills)
+        // Plan 1: Exact 4 Minutes (240s total = 8 Sets across 4 Fast-Feet Drills)
+        WorkoutCircuit(
+            id = "circuit_4min_fast_feet_primer",
+            title = "4-Min Chinese Fast-Feet Primer",
+            subtitle = "High-velocity 240 BPM neural wake-up for tournament pre-match warmup (4m 00s · 8 Sets).",
+            durationBadge = "4 MIN · PRIMER",
+            focusTag = "Chinese Fast-Feet Warmup",
+            items = listOf(
+                WorkoutCircuitItem(exercise = ex("ff_wide_stance_tapping"), sets = 2, workSec = 20, restSec = 10),
+                WorkoutCircuitItem(exercise = ex("ff_in_and_out_split_step"), sets = 2, workSec = 20, restSec = 10),
+                WorkoutCircuitItem(exercise = ex("ff_tapping_reactive_burst"), sets = 2, workSec = 20, restSec = 10),
+                WorkoutCircuitItem(exercise = ex("ff_staggered_scissor_switches"), sets = 2, workSec = 20, restSec = 10)
+            ),
+            isPreBuilt = true
+        ),
+        // Plan 2: Exact 8 Minutes (480s total = 12 Sets across 4 SSC Ankle Drills)
+        WorkoutCircuit(
+            id = "circuit_8min_ssc_express",
+            title = "8-Min Ankle Stiffness SSC Express",
+            subtitle = "Targeted Achilles tendon elasticity and low-ground-contact plyometric micro-dosing (8m 00s · 12 Sets).",
+            durationBadge = "8 MIN · SSC EXPRESS",
+            focusTag = "Achilles Stiffness Express",
+            items = listOf(
+                WorkoutCircuitItem(exercise = ex("ssc_double_leg_pogo"), sets = 3, workSec = 25, restSec = 15),
+                WorkoutCircuitItem(exercise = ex("ssc_split_stance_pogo"), sets = 3, workSec = 25, restSec = 15),
+                WorkoutCircuitItem(exercise = ex("ssc_4_pogo_1_tuck"), sets = 3, workSec = 25, restSec = 15),
+                WorkoutCircuitItem(exercise = ex("ssc_single_leg_lateral_line_pogo"), sets = 3, workSec = 25, restSec = 15)
+            ),
+            isPreBuilt = true
+        ),
+        // Plan 3: Exact 15 Minutes (900s total = 18 Sets across 5 Drills)
         WorkoutCircuit(
             id = "circuit_15min_cns_activation",
             title = "15-Min Pre-Court CNS & Fast Feet Activation",
@@ -349,7 +379,7 @@ object AuthenticBadmintonDrillsSeed {
             ),
             isPreBuilt = true
         ),
-        // Plan 2: Exact 20 Minutes (1,200s total = 22 Sets across 6 Drills)
+        // Plan 4: Exact 20 Minutes (1,200s total = 22 Sets across 6 Drills)
         WorkoutCircuit(
             id = "circuit_20min_chinese_footwork",
             title = "20-Min Chinese Footwork & Tapping Endurance",
@@ -366,7 +396,7 @@ object AuthenticBadmintonDrillsSeed {
             ),
             isPreBuilt = true
         ),
-        // Plan 3: Exact 25 Minutes (1,500s total = 26 Sets across 7 Drills)
+        // Plan 5: Exact 25 Minutes (1,500s total = 26 Sets across 7 Drills)
         WorkoutCircuit(
             id = "circuit_25min_tendon_plyo",
             title = "25-Min Tendon Stiffness & Plyometric Explosiveness",

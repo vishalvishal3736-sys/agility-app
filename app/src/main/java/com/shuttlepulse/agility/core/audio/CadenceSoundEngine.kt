@@ -20,6 +20,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.PI
@@ -33,11 +34,11 @@ import kotlinx.coroutines.launch
 /**
  * Hybrid Zero-Latency Audio & Cadence Engine:
  * 1. Uses [AudioAttributes.USAGE_GAME] on [SoundPool] and low-latency [AudioTrack] static buffers
- *    so cadence ticks (800Hz), accent bounces (960Hz), countdown pips (1080Hz), and burst whistles
- *    (1600Hz) route through the Media volume stream via Android's Fast Mixer (<10ms latency) and
- *    are never muted by silent/vibrate ringer state.
- * 2. [TextToSpeech] configured at 1.38f speech rate for punchy, zero-overlap athletic cues.
- * 3. Single-owner [AudioManager] transient music ducking ([AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK]).
+ *    so cadence ticks (880Hz), accent beats (1320Hz), countdown pips (660Hz), and burst whistles
+ *    (1760Hz + 2640Hz dual-harmonic) route through Android's Fast Mixer (<10ms latency).
+ * 2. Dedicated single-thread audio dispatcher ("ShuttlePulseAudioThread") for AudioTrack playback.
+ * 3. [TextToSpeech] configured at 1.35f speech rate and 1.05f pitch for snappy, punchy athletic cues.
+ * 4. Single-owner [AudioManager] transient music ducking ([AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK]).
  */
 @Singleton
 class CadenceSoundEngine @Inject constructor(
@@ -45,6 +46,7 @@ class CadenceSoundEngine @Inject constructor(
 ) : TextToSpeech.OnInitListener {
 
     private val engineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val audioExecutor = Executors.newSingleThreadExecutor { Thread(it, "ShuttlePulseAudioThread") }
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
     private val soundPool: SoundPool
     private val loadedSoundIds = ConcurrentHashMap.newKeySet<Int>()
@@ -123,8 +125,8 @@ class CadenceSoundEngine @Inject constructor(
                     .build()
                 tts?.setAudioAttributes(speechAttrs)
                 tts?.language = Locale.US
-                tts?.setSpeechRate(1.38f)
-                tts?.setPitch(1.04f)
+                tts?.setSpeechRate(1.35f)
+                tts?.setPitch(1.05f)
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
                         // Focus is already requested prior to speakCue() if audioDuckingEnabled
@@ -146,16 +148,16 @@ class CadenceSoundEngine @Inject constructor(
 
     private fun initProgrammaticAudioTracks() {
         runCatching {
-            // 800Hz crisp 28ms cadence blip PCM buffer
-            val tickPcm = generatePcmBuffer(frequencyHz = 800.0, durationMs = 28, harmonic = 0.18)
+            // 880Hz crisp 32ms standard cadence tick PCM buffer
+            val tickPcm = generatePcmBuffer(frequencyHz = 880.0, durationMs = 32, harmonicFreqHz = 1760.0, harmonic = 0.15)
             staticTickTrack = createStaticAudioTrack(tickPcm)
 
-            // 960Hz 40ms accent beat PCM buffer
-            val accentPcm = generatePcmBuffer(frequencyHz = 960.0, durationMs = 40, harmonic = 0.25)
+            // 1320Hz 38ms accent beat PCM buffer
+            val accentPcm = generatePcmBuffer(frequencyHz = 1320.0, durationMs = 38, harmonicFreqHz = 2640.0, harmonic = 0.20)
             staticAccentTrack = createStaticAudioTrack(accentPcm)
 
-            // 1600Hz sharp 125ms burst whistle PCM buffer
-            val whistlePcm = generatePcmBuffer(frequencyHz = 1600.0, durationMs = 125, harmonic = 0.35)
+            // Dual-harmonic 1760Hz + 2640Hz sharp 140ms burst whistle PCM buffer
+            val whistlePcm = generatePcmBuffer(frequencyHz = 1760.0, durationMs = 140, harmonicFreqHz = 2640.0, harmonic = 0.40)
             staticWhistleTrack = createStaticAudioTrack(whistlePcm)
 
             isAudioTrackReady = (staticTickTrack != null && staticWhistleTrack != null)
@@ -164,7 +166,7 @@ class CadenceSoundEngine @Inject constructor(
 
     private fun createStaticAudioTrack(pcmBytes: ByteArray): AudioTrack? {
         return runCatching {
-            val sampleRate = 22050
+            val sampleRate = 44100
             val attrs = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -217,14 +219,16 @@ class CadenceSoundEngine @Inject constructor(
 
         val track = if (isAccentBeat) staticAccentTrack ?: staticTickTrack else staticTickTrack
         if (track != null) {
-            runCatching {
-                if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
-                    track.stop()
+            audioExecutor.execute {
+                runCatching {
+                    if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+                        track.stop()
+                    }
+                    track.reloadStaticData()
+                    track.play()
                 }
-                track.reloadStaticData()
-                track.play()
-                return
             }
+            return
         }
 
         runCatching {
@@ -233,7 +237,7 @@ class CadenceSoundEngine @Inject constructor(
     }
 
     /**
-     * Plays a distinct 3-2-1 countdown pip during the final 3 seconds of Prep or Rest
+     * Plays a distinct 3-2-1 countdown pip (660Hz tone) during the final 3 seconds of Prep or Rest
      * (never suppressed if metronome ticks are toggled off).
      */
     fun playCountdownPip(isFinalSecond: Boolean = false) {
@@ -247,7 +251,7 @@ class CadenceSoundEngine @Inject constructor(
     }
 
     /**
-     * Plays a sharp 1600Hz burst whistle + haptic pulse + optional concise spoken TTS trigger.
+     * Plays a sharp dual-harmonic 1760Hz + 2640Hz burst whistle + haptic pulse + optional concise spoken TTS trigger.
      */
     fun playExplosiveBurstWhistle(spokenTrigger: String? = null) {
         if (isSampleLoaded(burstWhistleId)) {
@@ -255,12 +259,14 @@ class CadenceSoundEngine @Inject constructor(
         } else {
             val track = staticWhistleTrack
             if (track != null) {
-                runCatching {
-                    if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
-                        track.stop()
+                audioExecutor.execute {
+                    runCatching {
+                        if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
+                            track.stop()
+                        }
+                        track.reloadStaticData()
+                        track.play()
                     }
-                    track.reloadStaticData()
-                    track.play()
                 }
             } else {
                 runCatching {
@@ -297,6 +303,11 @@ class CadenceSoundEngine @Inject constructor(
             playExplosiveBurstWhistle("Split step, lunge!")
         }
     }
+
+    fun testCadenceTick() = playCadenceTick(isAccentBeat = false)
+    fun testAccentBeat() = playCadenceTick(isAccentBeat = true)
+    fun testBurstWhistle() = playExplosiveBurstWhistle("Explode! Racket lunge!")
+    fun testCountdownPip() = playCountdownPip(isFinalSecond = true)
 
     fun speakCue(text: String) {
         if (!voiceCalloutsEnabled || !isTtsReady || text.isBlank()) return
@@ -389,9 +400,10 @@ class CadenceSoundEngine @Inject constructor(
     private fun generatePcmBuffer(
         frequencyHz: Double,
         durationMs: Int,
-        harmonic: Double
+        harmonicFreqHz: Double = frequencyHz * 2.0,
+        harmonic: Double = 0.20
     ): ByteArray {
-        val sampleRate = 22050
+        val sampleRate = 44100
         val numSamples = (sampleRate * durationMs) / 1000
         val pcm = ByteArray(numSamples * 2)
 
@@ -402,7 +414,7 @@ class CadenceSoundEngine @Inject constructor(
             val attack = (i.toDouble() / attackSamples).coerceAtMost(1.0)
             val decay = (1.0 - (i.toDouble() / numSamples.toDouble())).coerceIn(0.0, 1.0)
             val env = attack * decay * decay
-            val wave = (sin(2.0 * PI * frequencyHz * t) + sin(4.0 * PI * frequencyHz * t) * harmonic) /
+            val wave = (sin(2.0 * PI * frequencyHz * t) + sin(2.0 * PI * harmonicFreqHz * t) * harmonic) /
                 (1.0 + harmonic)
             val sample = (wave * env * Short.MAX_VALUE * 0.90).toInt()
                 .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
@@ -414,11 +426,12 @@ class CadenceSoundEngine @Inject constructor(
 
     private fun synthesizeAndLoadSoundEffects() {
         runCatching {
-            val tickFile = writeSynthesizedWav("sp_v2_tick_800.wav", 800.0, 28, 0.18)
-            val bounceFile = writeSynthesizedWav("sp_v2_bounce_960.wav", 960.0, 42, 0.25)
-            val pipFile = writeSynthesizedWav("sp_v2_pip_1080.wav", 1080.0, 55, 0.22)
-            val burstFile = writeSynthesizedWav("sp_v2_whistle_1600.wav", 1600.0, 130, 0.38)
-            val switchFile = writeSynthesizedWav("sp_v2_switch_1180.wav", 1180.0, 160, 0.30)
+            // Standard tick 880Hz (32ms), Accent 1320Hz (38ms), Countdown Pip 660Hz (90ms), Whistle 1760+2640Hz (140ms)
+            val tickFile = writeSynthesizedWav("sp_v3_tick_880.wav", 880.0, 32, 1760.0, 0.15)
+            val bounceFile = writeSynthesizedWav("sp_v3_accent_1320.wav", 1320.0, 38, 2640.0, 0.20)
+            val pipFile = writeSynthesizedWav("sp_v3_pip_660.wav", 660.0, 90, 1320.0, 0.15)
+            val burstFile = writeSynthesizedWav("sp_v3_whistle_1760_2640.wav", 1760.0, 140, 2640.0, 0.40)
+            val switchFile = writeSynthesizedWav("sp_v3_switch_1100.wav", 1100.0, 150, 1650.0, 0.25)
 
             metronomeTickId = soundPool.load(tickFile.absolutePath, 1)
             comboBounceId = soundPool.load(bounceFile.absolutePath, 1)
@@ -432,13 +445,14 @@ class CadenceSoundEngine @Inject constructor(
         fileName: String,
         frequencyHz: Double,
         durationMs: Int,
-        harmonic: Double
+        harmonicFreqHz: Double = frequencyHz * 2.0,
+        harmonic: Double = 0.20
     ): File {
         val file = File(context.cacheDir, fileName)
         if (file.exists() && file.length() > 100L) return file
 
-        val sampleRate = 22050
-        val pcm = generatePcmBuffer(frequencyHz, durationMs, harmonic)
+        val sampleRate = 44100
+        val pcm = generatePcmBuffer(frequencyHz, durationMs, harmonicFreqHz, harmonic)
         val header = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN).apply {
             put("RIFF".toByteArray(Charsets.US_ASCII))
             putInt(pcm.size + 36)
@@ -464,6 +478,7 @@ class CadenceSoundEngine @Inject constructor(
 
     fun release() {
         abandonDuckFocus()
+        runCatching { audioExecutor.shutdown() }
         runCatching { staticTickTrack?.release() }
         runCatching { staticAccentTrack?.release() }
         runCatching { staticWhistleTrack?.release() }

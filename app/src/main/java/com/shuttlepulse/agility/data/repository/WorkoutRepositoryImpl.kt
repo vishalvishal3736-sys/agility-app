@@ -136,13 +136,15 @@ class WorkoutRepositoryImpl @Inject constructor(
         duckingEnabled: Boolean,
         metronomeEnabled: Boolean,
         voiceEnabled: Boolean,
-        bpmScale: Float
+        bpmScale: Float,
+        bpmOffset: Int
     ) {
         userPreferencesRepository.updateAudioPreferences(
             duckingEnabled = duckingEnabled,
             metronomeEnabled = metronomeEnabled,
             voiceEnabled = voiceEnabled,
-            bpmScale = bpmScale
+            bpmScale = bpmScale,
+            bpmOffset = bpmOffset
         )
     }
 

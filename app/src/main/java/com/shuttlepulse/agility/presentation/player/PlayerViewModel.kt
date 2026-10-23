@@ -58,7 +58,8 @@ class PlayerViewModel @Inject constructor(
                     val timeline = generateWorkoutTimelineUseCase(
                         circuit = circuit,
                         dominantHand = prefs.dominantHand,
-                        bpmScale = prefs.bpmCalibrationScale
+                        bpmScale = prefs.bpmCalibrationScale,
+                        bpmOffset = prefs.bpmOffset
                     )
                     val firstSeg = timeline.firstOrNull()
                     _uiState.update {
@@ -92,6 +93,8 @@ class PlayerViewModel @Inject constructor(
 
     fun selectPreBuiltPlanByDuration(minutes: Int) {
         val targetId = when (minutes) {
+            4 -> "circuit_4min_fast_feet_primer"
+            8 -> "circuit_8min_ssc_express"
             15 -> "circuit_15min_cns_activation"
             20 -> "circuit_20min_chinese_footwork"
             25 -> "circuit_25min_tendon_plyo"
@@ -113,7 +116,8 @@ class PlayerViewModel @Inject constructor(
         val timeline = generateWorkoutTimelineUseCase(
             circuit = circuit,
             dominantHand = prefs.dominantHand,
-            bpmScale = prefs.bpmCalibrationScale
+            bpmScale = prefs.bpmCalibrationScale,
+            bpmOffset = prefs.bpmOffset
         )
         if (timeline.isEmpty()) return
 

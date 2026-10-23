@@ -73,14 +73,16 @@ class HomeViewModel @Inject constructor(
         duckingEnabled: Boolean,
         metronomeEnabled: Boolean,
         voiceEnabled: Boolean,
-        bpmScale: Float
+        bpmScale: Float,
+        bpmOffset: Int = uiState.value.preferences.bpmOffset
     ) {
         viewModelScope.launch {
             workoutRepository.updateAudioPreferences(
                 duckingEnabled = duckingEnabled,
                 metronomeEnabled = metronomeEnabled,
                 voiceEnabled = voiceEnabled,
-                bpmScale = bpmScale
+                bpmScale = bpmScale,
+                bpmOffset = bpmOffset
             )
         }
     }

@@ -19,6 +19,7 @@ class GenerateWorkoutTimelineUseCase @Inject constructor() {
         circuit: WorkoutCircuit,
         dominantHand: DominantHand,
         bpmScale: Float = 1.0f,
+        bpmOffset: Int = 0,
         random: Random = Random.Default
     ): List<WorkoutSegment> {
         val segments = mutableListOf<WorkoutSegment>()
@@ -31,6 +32,7 @@ class GenerateWorkoutTimelineUseCase @Inject constructor() {
 
         // Initial 5-second Prep Countdown before the first set
         val firstItem = items.first()
+        val firstItemBpm = ((firstItem.targetBpm * bpmScale).toInt() + bpmOffset).coerceIn(60, 300)
         segments.add(
             WorkoutSegment(
                 segmentIndex = segIdx++,
@@ -41,7 +43,7 @@ class GenerateWorkoutTimelineUseCase @Inject constructor() {
                 overallSetIndex = 1,
                 totalWorkSetsInWorkout = totalWorkSets,
                 durationMs = 5_000L,
-                targetBpm = (firstItem.targetBpm * bpmScale).toInt().coerceIn(60, 300),
+                targetBpm = firstItemBpm,
                 initialLeadFootBanner = resolveInitialStanceBanner(firstItem.exercise, dominantHand),
                 midSetLeadFootBanner = null,
                 nextExercisePreviewName = firstItem.exercise.name
@@ -51,7 +53,7 @@ class GenerateWorkoutTimelineUseCase @Inject constructor() {
         for (itemIndex in items.indices) {
             val item = items[itemIndex]
             val exercise = item.exercise
-            val scaledBpm = (item.targetBpm * bpmScale).toInt().coerceIn(60, 300)
+            val scaledBpm = ((item.targetBpm * bpmScale).toInt() + bpmOffset).coerceIn(60, 300)
             val workDurationMs = (item.workSec.coerceAtLeast(10)) * 1000L
             val restDurationMs = (item.restSec.coerceAtLeast(5)) * 1000L
 
