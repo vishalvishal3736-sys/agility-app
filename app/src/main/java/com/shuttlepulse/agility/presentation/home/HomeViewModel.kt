@@ -11,4 +11,16 @@ typealias HomeUiState = DashboardUiState
 class HomeViewModel @Inject constructor(
     repository: WorkoutRepository,
     cadenceSoundEngine: CadenceSoundEngine
-) : DashboardViewModel(repository, cadenceSoundEngine)
+) : DashboardViewModel(repository, cadenceSoundEngine) {
+    companion object {
+        fun provideFactory(
+            workoutRepository: WorkoutRepository,
+            cadenceSoundEngine: CadenceSoundEngine
+        ): androidx.lifecycle.ViewModelProvider.Factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return HomeViewModel(workoutRepository, cadenceSoundEngine) as T
+            }
+        }
+    }
+}

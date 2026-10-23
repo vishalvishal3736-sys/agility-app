@@ -23,7 +23,7 @@ data class DashboardUiState(
     val preferences: UserPreferences = UserPreferences()
 )
 
-class DashboardViewModel @Inject constructor(
+open class DashboardViewModel @Inject constructor(
     private val repository: ShuttlePulseRepository,
     private val cadenceSoundEngine: CadenceSoundEngine
 ) : ViewModel() {

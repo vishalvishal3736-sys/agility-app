@@ -43,6 +43,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
 import com.shuttlepulse.agility.presentation.settings.SettingsScreen
 import com.shuttlepulse.agility.presentation.settings.SettingsViewModel
+import com.shuttlepulse.agility.presentation.dashboard.DashboardScreen
+import com.shuttlepulse.agility.presentation.dashboard.DashboardViewModel
 import com.shuttlepulse.agility.presentation.home.HomeScreen
 import com.shuttlepulse.agility.presentation.home.HomeViewModel
 import com.shuttlepulse.agility.presentation.library.DrillLibraryScreen
@@ -179,14 +181,14 @@ fun ShuttlePulseNavHost(
                 .padding(innerPadding)
         ) {
             composable<ShuttlePulseRoute.Home> {
-                val homeViewModel: HomeViewModel = viewModel(
-                    factory = HomeViewModel.provideFactory(
-                        workoutRepository = workoutRepository,
+                val dashboardViewModel: DashboardViewModel = viewModel(
+                    factory = DashboardViewModel.provideFactory(
+                        repository = workoutRepository,
                         cadenceSoundEngine = cadenceSoundEngine
                     )
                 )
-                HomeScreen(
-                    viewModel = homeViewModel,
+                DashboardScreen(
+                    viewModel = dashboardViewModel,
                     onLaunchPlayer = {
                         navController.navigate(ShuttlePulseRoute.Player) {
                             launchSingleTop = true

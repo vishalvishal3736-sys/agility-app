@@ -133,7 +133,7 @@ fun SettingsScreen(
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = ShuttlePulseColors.VoltPlyoLime.copy(alpha = 0.22f),
                                     selectedLabelColor = ShuttlePulseColors.VoltPlyoLime,
-                                    unselectedLabelColor = ShuttlePulseColors.TextSlateMuted
+                                    labelColor = ShuttlePulseColors.TextSlateMuted
                                 )
                             )
                         }

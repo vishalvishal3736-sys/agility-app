@@ -15,6 +15,12 @@ object ShuttlePulseColors {
     val UnilateralAmber = Color(0xFFFFB800)     // Side Switch Amber (#FFB800)
     val RecoveryMint = Color(0xFF00E676)        // Active Rest Mint (#00E676)
 
+    // Aliases for compatibility across components
+    val VoltPlyoLime = PlyoLime
+    val ExplosiveBurstCrimson = BurstCrimson
+    val OledGymBlack = CourtObsidian
+    val UnilateralSwitchAmber = UnilateralAmber
+
     val TextCrispWhite = Color(0xFFF8FAFC)
     val TextSlateMuted = Color(0xFF94A3B8)
     val CourtLineAqua = Color(0x3300F0FF)
