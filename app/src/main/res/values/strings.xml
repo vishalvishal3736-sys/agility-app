@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ShuttlePulse</string>
+    <string name="nav_home">Sessions</string>
+    <string name="nav_library">Encyclopedia</string>
+    <string name="nav_builder">Builder</string>
+    <string name="nav_player">Player HUD</string>
+    <string name="nav_diagnostics">Diagnostics</string>
+</resources>

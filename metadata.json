@@ -1,0 +1,8 @@
+{
+  "name": "ShuttlePulse",
+  "description": "Authentic Badminton Off-Court Agility, Fast-Feet Tapping, and Plyometrics Workout App with rhythmic BPM cadence, combo cycles, reactive burst triggers, and unilateral stance coaching.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="180dp"
+    android:viewportWidth="360"
+    android:viewportHeight="180">
+    <!-- Deep OLED Arena Background -->
+    <path android:pathData="M0,0h360v180h-360z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="360"
+                android:endY="180"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF05070B" />
+                <item android:offset="0.5" android:color="#FF0B1422" />
+                <item android:offset="1.0" android:color="#FF070A10" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Perspective Court Outer Lines -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M70,22L290,22L330,158L30,158Z"
+        android:strokeWidth="2"
+        android:strokeColor="#4400F0FF" />
+    <!-- Net Line Top -->
+    <path
+        android:pathData="M62,22L298,22"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FF00F0FF" />
+    <!-- Short Service Line -->
+    <path
+        android:pathData="M60,56L300,56"
+        android:strokeWidth="1.5"
+        android:strokeColor="#5500F0FF" />
+    <!-- Center Line -->
+    <path
+        android:pathData="M180,56L180,158"
+        android:strokeWidth="1.5"
+        android:strokeColor="#5500F0FF" />
+    <!-- Doubles Long Service Line -->
+    <path
+        android:pathData="M36,138L324,138"
+        android:strokeWidth="1.5"
+        android:strokeColor="#5500F0FF" />
+    <!-- Vector Lunge Trajectory -->
+    <path
+        android:pathData="M180,96L92,36M180,96L288,144M180,96L268,36"
+        android:strokeWidth="2.5"
+        android:strokeColor="#88CCFF00" />
+    <!-- Center Base Box -->
+    <path
+        android:fillColor="#2200F0FF"
+        android:pathData="M158,82L202,82L206,110L154,110Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FF00F0FF" />
+    <!-- Active Target Nodes -->
+    <path
+        android:fillColor="#FFCCFF00"
+        android:pathData="M92,36m-8,0a8,8 0 1,1 16,0a8,8 0 1,1 -16,0" />
+    <path
+        android:fillColor="#FFCCFF00"
+        android:pathData="M268,36m-6,0a6,6 0 1,1 12,0a6,6 0 1,1 -12,0" />
+    <path
+        android:fillColor="#FFFF2E63"
+        android:pathData="M288,144m-9,0a9,9 0 1,1 18,0a9,9 0 1,1 -18,0" />
+</vector>
