@@ -74,15 +74,3 @@ enum class DominantHand(
         }
     }
 }
-
-@Serializable
-enum class StancePoseType(val label: String) {
-    DOUBLE_LEG_POGO("Vertical Stiff-Ankle Pogo"),
-    SPLIT_STANCE_RACKET_LEAD("Split-Stance Racket Foot Lead"),
-    SPLIT_STANCE_NON_RACKET_LEAD("Split-Stance Support Foot Lead"),
-    WIDE_BASE_FAST_TAP("Wide Badminton Base Fast Tapping"),
-    DEEP_RACKET_LUNGE("Extended Deep Forehand Lunge"),
-    SCISSOR_KICK_ROTATION("Mid-Air Rear Scissor Hip Switch"),
-    TUCK_JUMP_PEAK("Maximal Tuck Jump Peak"),
-    LATERAL_SKATER_STICK("Lateral China/Skater Stick")
-}

@@ -112,38 +112,30 @@ fun FootStanceCanvas(
         val supportFootCenter: Offset
 
         when (pose) {
-            StancePoseType.DOUBLE_LEG_POGO,
-            StancePoseType.TUCK_JUMP_PEAK -> {
+            StancePoseType.PARALLEL_POGO_BOUNCE,
+            StancePoseType.HIGH_TUCK_EXPLOSION -> {
                 val spread = w * 0.13f
                 val bounceY = wave * 8f
                 racketFootCenter = Offset(cx + spread * dir, cy - bounceY)
                 supportFootCenter = Offset(cx - spread * dir, cy - bounceY)
             }
 
-            StancePoseType.WIDE_BASE_FAST_TAP -> {
+            StancePoseType.WIDE_FAST_TAPPING -> {
                 val wideSpread = w * 0.24f
                 val tapDelta = altWave * 9f
                 racketFootCenter = Offset(cx + wideSpread * dir, cy - tapDelta - 6f)
                 supportFootCenter = Offset(cx - wideSpread * dir, cy + tapDelta + 6f)
             }
 
-            StancePoseType.SPLIT_STANCE_RACKET_LEAD,
-            StancePoseType.SCISSOR_KICK_ROTATION -> {
+            StancePoseType.STAGGERED_SCISSOR_STANCE -> {
                 val spread = w * 0.14f
                 val stagger = h * 0.21f
                 racketFootCenter = Offset(cx + spread * dir, cy - stagger - wave * 5f)
                 supportFootCenter = Offset(cx - spread * dir, cy + stagger - wave * 5f)
             }
 
-            StancePoseType.SPLIT_STANCE_NON_RACKET_LEAD -> {
-                val spread = w * 0.14f
-                val stagger = h * 0.21f
-                racketFootCenter = Offset(cx + spread * dir, cy + stagger - wave * 5f)
-                supportFootCenter = Offset(cx - spread * dir, cy - stagger - wave * 5f)
-            }
-
             StancePoseType.DEEP_RACKET_LUNGE,
-            StancePoseType.LATERAL_SKATER_STICK -> {
+            StancePoseType.LATERAL_SKATER_BOUND -> {
                 val spread = w * 0.22f
                 val lungeReach = h * 0.26f
                 racketFootCenter = Offset(cx + spread * dir, cy - lungeReach)

@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class ShuttlePulseApplication : Application() {
+open class ShuttlePulseApp : Application() {
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -15,7 +15,9 @@ class ShuttlePulseApplication : Application() {
         super.onCreate()
         AppModule.provideCadenceSoundEngine(this)
         appScope.launch {
-            AppModule.provideWorkoutRepository(this@ShuttlePulseApplication).ensureSeeded()
+            AppModule.provideWorkoutRepository(this@ShuttlePulseApp).ensureSeeded()
         }
     }
 }
+
+typealias ShuttlePulseApplication = ShuttlePulseApp

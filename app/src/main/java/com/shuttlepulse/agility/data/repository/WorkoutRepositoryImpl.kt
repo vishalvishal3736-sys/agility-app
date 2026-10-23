@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Singleton
-class WorkoutRepositoryImpl @Inject constructor(
+open class WorkoutRepositoryImpl @Inject constructor(
     private val exerciseDao: ExerciseDao,
     private val workoutDao: WorkoutDao,
     private val sessionLogDao: SessionLogDao,

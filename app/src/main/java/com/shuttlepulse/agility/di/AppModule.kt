@@ -2,34 +2,36 @@ package com.shuttlepulse.agility.di
 
 import android.content.Context
 import androidx.room.Room
-import com.shuttlepulse.agility.core.audio.CadenceSoundEngine
 import com.shuttlepulse.agility.core.timer.MicroPhaseWorkoutTimer
-import com.shuttlepulse.agility.data.local.AppDatabase
-import com.shuttlepulse.agility.data.repository.UserPreferencesRepository
-import com.shuttlepulse.agility.data.repository.WorkoutRepositoryImpl
+import com.shuttlepulse.agility.data.local.ShuttlePulseDatabase
+import com.shuttlepulse.agility.data.preferences.UserPreferencesRepository
+import com.shuttlepulse.agility.data.repository.ShuttlePulseRepositoryImpl
+import com.shuttlepulse.agility.domain.engine.WorkoutTimelineGenerator
+import com.shuttlepulse.agility.domain.repository.ShuttlePulseRepository
 import com.shuttlepulse.agility.domain.repository.WorkoutRepository
 import com.shuttlepulse.agility.domain.usecase.AuditFeatureHealthUseCase
 import com.shuttlepulse.agility.domain.usecase.GenerateWorkoutTimelineUseCase
+import com.shuttlepulse.agility.presentation.player.CadenceSoundEngine
 
 object AppModule {
 
     @Volatile
-    private var database: AppDatabase? = null
+    private var database: ShuttlePulseDatabase? = null
 
     @Volatile
     private var userPreferencesRepository: UserPreferencesRepository? = null
 
     @Volatile
-    private var workoutRepository: WorkoutRepository? = null
+    private var shuttlePulseRepository: ShuttlePulseRepository? = null
 
     @Volatile
     private var cadenceSoundEngine: CadenceSoundEngine? = null
 
-    fun provideDatabase(context: Context): AppDatabase {
+    fun provideDatabase(context: Context): ShuttlePulseDatabase {
         return database ?: synchronized(this) {
             database ?: Room.databaseBuilder(
                 context.applicationContext,
-                AppDatabase::class.java,
+                ShuttlePulseDatabase::class.java,
                 "shuttlepulse_conditioning.db"
             ).fallbackToDestructiveMigration(true).build().also { database = it }
         }
@@ -44,14 +46,18 @@ object AppModule {
     }
 
     fun provideWorkoutRepository(context: Context): WorkoutRepository {
-        return workoutRepository ?: synchronized(this) {
+        return (provideShuttlePulseRepository(context) as WorkoutRepository)
+    }
+
+    fun provideShuttlePulseRepository(context: Context): ShuttlePulseRepository {
+        return shuttlePulseRepository ?: synchronized(this) {
             val db = provideDatabase(context)
-            workoutRepository ?: WorkoutRepositoryImpl(
+            shuttlePulseRepository ?: ShuttlePulseRepositoryImpl(
                 exerciseDao = db.exerciseDao(),
                 workoutDao = db.workoutDao(),
                 sessionLogDao = db.sessionLogDao(),
                 userPreferencesRepository = provideUserPreferencesRepository(context)
-            ).also { workoutRepository = it }
+            ).also { shuttlePulseRepository = it }
         }
     }
 
@@ -65,8 +71,10 @@ object AppModule {
 
     fun provideMicroPhaseWorkoutTimer(): MicroPhaseWorkoutTimer = MicroPhaseWorkoutTimer()
 
+    fun provideWorkoutTimelineGenerator(): WorkoutTimelineGenerator = WorkoutTimelineGenerator()
+
     fun provideGenerateWorkoutTimelineUseCase(): GenerateWorkoutTimelineUseCase =
-        GenerateWorkoutTimelineUseCase()
+        GenerateWorkoutTimelineUseCase(provideWorkoutTimelineGenerator())
 
     fun provideAuditFeatureHealthUseCase(): AuditFeatureHealthUseCase =
         AuditFeatureHealthUseCase(provideGenerateWorkoutTimelineUseCase())

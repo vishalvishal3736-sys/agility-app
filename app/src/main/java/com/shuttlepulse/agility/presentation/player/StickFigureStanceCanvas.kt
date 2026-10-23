@@ -204,7 +204,7 @@ private fun DrawScope.drawArticulatedBadmintonAthlete(
     val supportHand: Offset
 
     when (pose) {
-        StancePoseType.DOUBLE_LEG_POGO -> {
+        StancePoseType.PARALLEL_POGO_BOUNCE -> {
             val lift = bounceOffset * 1.4f
             hipCenter = Offset(cx, floorY - 88f * scale - lift)
             shoulderCenter = Offset(cx, hipCenter.y - 62f * scale)
@@ -220,17 +220,16 @@ private fun DrawScope.drawArticulatedBadmintonAthlete(
             supportHand = Offset(cx - 34f * scale * dir, shoulderCenter.y + 18f * scale)
         }
 
-        StancePoseType.SPLIT_STANCE_RACKET_LEAD -> {
+        StancePoseType.STAGGERED_SCISSOR_STANCE -> {
             val lift = bounceOffset
             hipCenter = Offset(cx, floorY - 82f * scale - lift)
             shoulderCenter = Offset(cx + 6f * scale * dir, hipCenter.y - 60f * scale)
             headCenter = Offset(shoulderCenter.x + 2f * scale * dir, shoulderCenter.y - 26f * scale)
 
-            // Racket foot forward
+            // Racket foot forward, support foot staggered back
             racketKnee = Offset(cx + 34f * scale * dir, floorY - 42f * scale - lift * 0.6f)
             racketFoot = Offset(cx + 42f * scale * dir, floorY - lift * 0.5f)
 
-            // Support foot staggered back
             supportKnee = Offset(cx - 26f * scale * dir, floorY - 40f * scale - lift * 0.6f)
             supportFoot = Offset(cx - 42f * scale * dir, floorY - lift * 0.5f)
 
@@ -238,25 +237,7 @@ private fun DrawScope.drawArticulatedBadmintonAthlete(
             supportHand = Offset(cx - 32f * scale * dir, shoulderCenter.y + 16f * scale)
         }
 
-        StancePoseType.SPLIT_STANCE_NON_RACKET_LEAD -> {
-            val lift = bounceOffset
-            hipCenter = Offset(cx, floorY - 82f * scale - lift)
-            shoulderCenter = Offset(cx - 6f * scale * dir, hipCenter.y - 60f * scale)
-            headCenter = Offset(shoulderCenter.x - 2f * scale * dir, shoulderCenter.y - 26f * scale)
-
-            // Support foot forward (switched side)
-            supportKnee = Offset(cx + 34f * scale * dir, floorY - 42f * scale - lift * 0.6f)
-            supportFoot = Offset(cx + 42f * scale * dir, floorY - lift * 0.5f)
-
-            // Racket foot back
-            racketKnee = Offset(cx - 26f * scale * dir, floorY - 40f * scale - lift * 0.6f)
-            racketFoot = Offset(cx - 42f * scale * dir, floorY - lift * 0.5f)
-
-            racketHand = Offset(cx + 40f * scale * dir, shoulderCenter.y + 4f * scale)
-            supportHand = Offset(cx - 38f * scale * dir, shoulderCenter.y + 8f * scale)
-        }
-
-        StancePoseType.WIDE_BASE_FAST_TAP -> {
+        StancePoseType.WIDE_FAST_TAPPING -> {
             val altTap = bounceOffset * 0.45f
             hipCenter = Offset(cx, floorY - 68f * scale)
             shoulderCenter = Offset(cx, hipCenter.y - 56f * scale)
@@ -289,41 +270,7 @@ private fun DrawScope.drawArticulatedBadmintonAthlete(
             supportHand = Offset(cx - 48f * scale * dir, shoulderCenter.y - 8f * scale)
         }
 
-        StancePoseType.SCISSOR_KICK_ROTATION -> {
-            val jumpLift = 28f * scale + bounceOffset * 0.8f
-            hipCenter = Offset(cx, floorY - 92f * scale - jumpLift)
-            shoulderCenter = Offset(cx - 6f * scale * dir, hipCenter.y - 58f * scale)
-            headCenter = Offset(shoulderCenter.x, shoulderCenter.y - 25f * scale)
-
-            // Scissor mid-air leg cross
-            racketKnee = Offset(cx - 28f * scale * dir, hipCenter.y + 34f * scale)
-            racketFoot = Offset(cx - 48f * scale * dir, hipCenter.y + 68f * scale)
-
-            supportKnee = Offset(cx + 30f * scale * dir, hipCenter.y + 28f * scale)
-            supportFoot = Offset(cx + 46f * scale * dir, hipCenter.y + 64f * scale)
-
-            racketHand = Offset(cx + 32f * scale * dir, shoulderCenter.y - 36f * scale)
-            supportHand = Offset(cx - 38f * scale * dir, shoulderCenter.y + 10f * scale)
-        }
-
-        StancePoseType.TUCK_JUMP_PEAK -> {
-            val jumpLift = 38f * scale + bounceOffset
-            hipCenter = Offset(cx, floorY - 94f * scale - jumpLift)
-            shoulderCenter = Offset(cx, hipCenter.y - 56f * scale)
-            headCenter = Offset(cx, shoulderCenter.y - 25f * scale)
-
-            // Knees tucked high toward chest
-            racketKnee = Offset(cx + 26f * scale * dir, hipCenter.y - 10f * scale)
-            racketFoot = Offset(cx + 22f * scale * dir, hipCenter.y + 28f * scale)
-
-            supportKnee = Offset(cx - 26f * scale * dir, hipCenter.y - 10f * scale)
-            supportFoot = Offset(cx - 22f * scale * dir, hipCenter.y + 28f * scale)
-
-            racketHand = Offset(cx + 44f * scale * dir, shoulderCenter.y - 18f * scale)
-            supportHand = Offset(cx - 44f * scale * dir, shoulderCenter.y - 18f * scale)
-        }
-
-        StancePoseType.LATERAL_SKATER_STICK -> {
+        StancePoseType.LATERAL_SKATER_BOUND -> {
             hipCenter = Offset(cx + 24f * scale * dir, floorY - 66f * scale)
             shoulderCenter = Offset(cx + 28f * scale * dir, hipCenter.y - 54f * scale)
             headCenter = Offset(shoulderCenter.x, shoulderCenter.y - 24f * scale)
@@ -338,6 +285,23 @@ private fun DrawScope.drawArticulatedBadmintonAthlete(
 
             racketHand = Offset(cx + 58f * scale * dir, shoulderCenter.y + 4f * scale)
             supportHand = Offset(cx - 24f * scale * dir, shoulderCenter.y + 12f * scale)
+        }
+
+        StancePoseType.HIGH_TUCK_EXPLOSION -> {
+            val jumpLift = 38f * scale + bounceOffset
+            hipCenter = Offset(cx, floorY - 94f * scale - jumpLift)
+            shoulderCenter = Offset(cx, hipCenter.y - 56f * scale)
+            headCenter = Offset(cx, shoulderCenter.y - 25f * scale)
+
+            // Knees tucked high toward chest
+            racketKnee = Offset(cx + 26f * scale * dir, hipCenter.y - 10f * scale)
+            racketFoot = Offset(cx + 22f * scale * dir, hipCenter.y + 28f * scale)
+
+            supportKnee = Offset(cx - 26f * scale * dir, hipCenter.y - 10f * scale)
+            supportFoot = Offset(cx - 22f * scale * dir, hipCenter.y + 28f * scale)
+
+            racketHand = Offset(cx + 44f * scale * dir, shoulderCenter.y - 18f * scale)
+            supportHand = Offset(cx - 44f * scale * dir, shoulderCenter.y - 18f * scale)
         }
     }
 

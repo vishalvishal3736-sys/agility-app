@@ -2,12 +2,15 @@ package com.shuttlepulse.agility
 
 import com.shuttlepulse.agility.core.timer.MicroPhaseWorkoutTimer
 import com.shuttlepulse.agility.data.local.seed.AuthenticBadmintonDrillsSeed
+import com.shuttlepulse.agility.data.local.seed.BadmintonSeedData
+import com.shuttlepulse.agility.domain.engine.WorkoutTimelineGenerator
 import com.shuttlepulse.agility.domain.model.DominantHand
 import com.shuttlepulse.agility.domain.model.DrillArchetype
 import com.shuttlepulse.agility.domain.model.Exercise
 import com.shuttlepulse.agility.domain.model.ExerciseCategory
 import com.shuttlepulse.agility.domain.model.MicroCueUrgency
 import com.shuttlepulse.agility.domain.model.SegmentType
+import com.shuttlepulse.agility.domain.model.StancePoseType
 import com.shuttlepulse.agility.domain.model.UserPreferences
 import com.shuttlepulse.agility.domain.model.WorkoutCircuit
 import com.shuttlepulse.agility.domain.model.WorkoutCircuitItem
@@ -26,14 +29,35 @@ class ShuttlePulseUnitTest {
 
     @Test
     fun seedContainsSixteenExercisesAndFivePreBuiltPrograms() {
-        assertEquals(16, AuthenticBadmintonDrillsSeed.exercises.size)
-        assertEquals(5, AuthenticBadmintonDrillsSeed.preBuiltCircuits.size)
-        val archetypes = AuthenticBadmintonDrillsSeed.exercises.map { it.archetype }.toSet()
+        assertEquals(16, BadmintonSeedData.exercises.size)
+        assertEquals(5, BadmintonSeedData.preBuiltCircuits.size)
+        val archetypes = BadmintonSeedData.exercises.map { it.archetype }.toSet()
         assertEquals(4, archetypes.size)
         assertTrue(archetypes.contains(DrillArchetype.RHYTHMIC_CADENCE))
         assertTrue(archetypes.contains(DrillArchetype.COMBO_CYCLE))
         assertTrue(archetypes.contains(DrillArchetype.BASE_PLUS_REACTIVE_BURST))
         assertTrue(archetypes.contains(DrillArchetype.UNILATERAL_POWER))
+    }
+
+    @Test
+    fun stancePoseTypes_matchSixCoreBiomechanicalTypes() {
+        val poses = StancePoseType.entries
+        assertEquals(6, poses.size)
+        assertTrue(poses.contains(StancePoseType.PARALLEL_POGO_BOUNCE))
+        assertTrue(poses.contains(StancePoseType.WIDE_FAST_TAPPING))
+        assertTrue(poses.contains(StancePoseType.STAGGERED_SCISSOR_STANCE))
+        assertTrue(poses.contains(StancePoseType.DEEP_RACKET_LUNGE))
+        assertTrue(poses.contains(StancePoseType.LATERAL_SKATER_BOUND))
+        assertTrue(poses.contains(StancePoseType.HIGH_TUCK_EXPLOSION))
+    }
+
+    @Test
+    fun workoutTimelineGenerator_matchesUseCaseTimeline() {
+        val generator = WorkoutTimelineGenerator()
+        val circuit = BadmintonSeedData.preBuiltCircuits.first()
+        val timelineGen = generator.generateTimeline(circuit, DominantHand.RIGHT)
+        val timelineUc = generateTimeline(circuit, DominantHand.RIGHT)
+        assertEquals(timelineGen.size, timelineUc.size)
     }
 
     @Test

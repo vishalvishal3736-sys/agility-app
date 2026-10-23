@@ -5,8 +5,8 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.shuttlepulse.agility.core.ui.theme.ShuttlePulseTheme
-import com.shuttlepulse.agility.presentation.navigation.AppNavHost
+import com.shuttlepulse.agility.presentation.navigation.ShuttlePulseNavHost
+import com.shuttlepulse.agility.presentation.theme.ShuttlePulseTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShuttlePulseTheme {
-                AppNavHost()
+                ShuttlePulseNavHost()
             }
         }
     }

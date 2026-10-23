@@ -83,7 +83,7 @@ fun CreateExerciseDialog(
     var targetBpm by remember { mutableFloatStateOf(160f) }
     var selectedCategory by remember { mutableStateOf<ExerciseCategory>(ExerciseCategory.FAST_FEET_CHINESE_TAPPING) }
     var selectedArchetype by remember { mutableStateOf<DrillArchetype>(DrillArchetype.RHYTHMIC_CADENCE) }
-    var selectedStance by remember { mutableStateOf<StancePoseType>(StancePoseType.WIDE_BASE_FAST_TAP) }
+    var selectedStance by remember { mutableStateOf<StancePoseType>(StancePoseType.WIDE_FAST_TAPPING) }
     var coachingTip by remember { mutableStateOf("Stay on balls of feet, stiff ankles") }
     var nameError by remember { mutableStateOf(false) }
 
@@ -320,10 +320,10 @@ fun CreateExerciseDialog(
                                     selectedArchetype = arc
                                     // Set natural base stance default for the chosen archetype
                                     selectedStance = when (arc) {
-                                        DrillArchetype.RHYTHMIC_CADENCE -> StancePoseType.DOUBLE_LEG_POGO
-                                        DrillArchetype.BASE_PLUS_REACTIVE_BURST -> StancePoseType.WIDE_BASE_FAST_TAP
-                                        DrillArchetype.COMBO_CYCLE -> StancePoseType.DOUBLE_LEG_POGO
-                                        DrillArchetype.UNILATERAL_POWER -> StancePoseType.SPLIT_STANCE_RACKET_LEAD
+                                        DrillArchetype.RHYTHMIC_CADENCE -> StancePoseType.PARALLEL_POGO_BOUNCE
+                                        DrillArchetype.BASE_PLUS_REACTIVE_BURST -> StancePoseType.WIDE_FAST_TAPPING
+                                        DrillArchetype.COMBO_CYCLE -> StancePoseType.PARALLEL_POGO_BOUNCE
+                                        DrillArchetype.UNILATERAL_POWER -> StancePoseType.STAGGERED_SCISSOR_STANCE
                                     }
                                 },
                                 label = { Text(arc.title) },
@@ -350,13 +350,7 @@ fun CreateExerciseDialog(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        listOf(
-                            StancePoseType.WIDE_BASE_FAST_TAP,
-                            StancePoseType.DOUBLE_LEG_POGO,
-                            StancePoseType.SPLIT_STANCE_RACKET_LEAD,
-                            StancePoseType.DEEP_RACKET_LUNGE,
-                            StancePoseType.SCISSOR_KICK_ROTATION
-                        ).forEach { pose ->
+                        StancePoseType.entries.forEach { pose ->
                             val selected = selectedStance == pose
                             FilterChip(
                                 selected = selected,
